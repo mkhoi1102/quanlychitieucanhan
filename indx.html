@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Chi Tiêu Cá Nhân</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 25px; color: #2c3e50; }
+        
+        /* Khu vực hiển thị số dư */
+        .thong-ke { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .the { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .the h3 { font-size: 14px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px; }
+        .the p { font-size: 22px; font-weight: bold; }
+        .so-du { color: #2ecc71; }
+        .thu-nhap { color: #3498db; }
+        .chi-tieu { color: #e74c3c; }
+
+        /* Khu vực nhập liệu */
+        .nhap-lieu { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .form-group { display: flex; gap: 10px; margin-top: 10px; }
+        input, select, button { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; outline: none; }
+        input[type="text"] { flex: 2; }
+        input[type="number"] { flex: 1.5; }
+        select { flex: 1; cursor: pointer; }
+        button { background-color: #2ecc71; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; flex: 1; }
+        button:hover { background-color: #27ae60; }
+
+        /* Danh sách lịch sử */
+        .lich-su { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .lich-su h2 { margin-bottom: 15px; font-size: 18px; color: #2c3e50; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; font-size: 16px; gap: 12px; }
+        .item:last-child { border-bottom: none; }
+        .item span { display: inline-block; }
+        .item span:first-child { font-size: 16px; flex: 1; }
+        .item span:last-child { font-size: 18px; min-width: 120px; text-align: right; }
+        .item button { border-radius: 5px; border: none; cursor: pointer; padding: 6px 8px; font-size: 14px; transition: background 0.2s; margin-left: 8px; }
+        .edit-btn { background: #3498db; color: white; }
+        .edit-btn:hover { background: #2980b9; }
+        .save-btn { background: #2ecc71; color: white; }
+        .save-btn:hover { background: #27ae60; }
+        .cancel-btn { background: #7f8c8d; color: white; }
+        .cancel-btn:hover { background: #606f7b; }
+        .delete-btn { background: #e74c3c; color: white; }
+        .delete-btn:hover { background: #c0392b; }
+        .edit-input { font-size: 16px; min-width: 120px; }
+        .the.no-debt { border: 1px solid #f1c40f; }
+        .debt { color: #f39c12; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📊 Quản Lý Chi Tiêu Cá Nhân</h1>
+
+        <div class="thong-ke">
+            <div class="the">
+                <h3>Số Dư Hiện Tại</h3>
+                <p class="so-du" id="balance">0 đ</p>
+            </div>
+            <div class="the">
+                <h3>Tổng Thu Nhập</h3>
+                <p class="thu-nhap" id="income">0 đ</p>
+            </div>
+            <div class="the">
+                <h3>Tổng Chi Tiêu</h3>
+                <p class="chi-tieu" id="expense">0 đ</p>
+            </div>
+            <div class="the no-debt" id="debt-card" style="display:none;">
+                <h3>Nợ Hiện Tại</h3>
+                <p class="debt" id="debt">0 đ</p>
+            </div>
+        </div>
+
+        <div class="nhap-lieu">
+            <h3>Thêm giao dịch mới</h3>
+            <div class="form-group">
+                <input type="text" id="text" placeholder="Tên khoản chi (VD: Lương, Ăn uống...)">
+                <input type="number" id="amount" placeholder="Số tiền (đ)">
+                <select id="type">
+                    <option value="thu">Thu nhập (+)</option>
+                    <option value="chi">Chi tiêu (-)</option>
+                </select>
+                <button id="add-btn">Thêm</button>
+            </div>
+        </div>
+
+        <div class="lich-su" id="list">
+            <h2>Lịch sử giao dịch gần đây</h2>
+            </div>
+    </div>
+
+    <script>
+        // 1. Lấy các phần tử trên giao diện để tương tác
+        const balance = document.getElementById('balance');
+        const income = document.getElementById('income');
+        const expense = document.getElementById('expense');
+        const list = document.getElementById('list');
+        const text = document.getElementById('text');
+        const amount = document.getElementById('amount');
+        const type = document.getElementById('type');
+        const addBtn = document.getElementById('add-btn');
+
+        // 2. Lấy dữ liệu từ Local Storage (nếu chưa có thì tạo mảng rỗng [])
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let editingIndex = null;
+
+        // 3. Hàm định dạng tiền tệ (thêm dấu phẩy: 10,000,000)
+        function formatCurrency(number) {
+            return number.toLocaleString('vi-VN') + ' đ';
+        }
+
+        // 4. Viết hoa chữ cái đầu của chuỗi
+        function capitalizeFirstLetter(str) {
+            if (!str) return '';
+            str = str.trim();
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // 5. Hàm cập nhật lại toàn bộ giao diện
+        function updateUI() {
+            // Xóa danh sách cũ đi để vẽ lại từ đầu
+            list.innerHTML = '<h2>Lịch sử giao dịch gần đây</h2>';
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            // Duyệt qua từng giao dịch để tính toán và in ra màn hình
+            transactions.forEach((transaction, index) => {
+                const isIncome = transaction.type === 'thu';
+                
+                if (isIncome) {
+                    totalIncome += transaction.amount;
+                } else {
+                    totalExpense += transaction.amount;
+                }
+
+                // Thiết lập màu sắc và dấu cộng/trừ
+                const sign = isIncome ? '+' : '-';
+                const color = isIncome ? '#3498db' : '#e74c3c';
+
+                // Tạo một dòng HTML mới cho giao dịch
+                const item = document.createElement('div');
+                item.classList.add('item');
+                if (index === editingIndex) {
+                    const label = document.createElement('span');
+                    label.textContent = capitalizeFirstLetter(transaction.text);
+                    const editGroup = document.createElement('div');
+                    editGroup.style.display = 'flex';
+                    editGroup.style.alignItems = 'center';
+                    editGroup.style.gap = '8px';
+
+                    const editInput = document.createElement('input');
+                    editInput.type = 'number';
+                    editInput.classList.add('edit-input');
+                    editInput.value = transaction.amount;
+                    editInput.min = '1';
+                    editInput.style.width = '140px';
+                    editInput.style.padding = '8px';
+                    editInput.style.border = '1px solid #ddd';
+                    editInput.style.borderRadius = '5px';
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('save-btn');
+                    saveButton.innerText = 'Lưu';
+                    saveButton.addEventListener('click', () => saveEdit(index, editInput.value));
+
+                    const cancelButton = document.createElement('button');
+                    cancelButton.classList.add('cancel-btn');
+                    cancelButton.innerText = 'Hủy';
+                    cancelButton.addEventListener('click', () => cancelEdit());
+
+                    editGroup.appendChild(editInput);
+                    editGroup.appendChild(saveButton);
+                    editGroup.appendChild(cancelButton);
+                    item.appendChild(label);
+                    item.appendChild(editGroup);
+                } else {
+                    item.innerHTML = `
+                        <span>${capitalizeFirstLetter(transaction.text)}</span>
+                        <span style="color: ${color}; font-weight: bold;">${sign}${formatCurrency(transaction.amount)}</span>
+                    `;
+                    const editButton = document.createElement('button');
+                    editButton.classList.add('edit-btn');
+                    editButton.innerText = 'Sửa';
+                    editButton.addEventListener('click', () => startEdit(index));
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.classList.add('delete-btn');
+                    deleteButton.innerText = 'Xóa';
+                    deleteButton.addEventListener('click', () => removeTransaction(index));
+
+                    item.appendChild(editButton);
+                    item.appendChild(deleteButton);
+                }
+                list.appendChild(item);
+            });
+
+            // Tính số dư và cập nhật lên các ô thông kê
+            const totalBalance = totalIncome - totalExpense;
+            const debtAmount = totalBalance < 0 ? Math.abs(totalBalance) : 0;
+            balance.innerText = formatCurrency(totalBalance < 0 ? 0 : totalBalance);
+            income.innerText = formatCurrency(totalIncome);
+            expense.innerText = formatCurrency(totalExpense);
+            const debtCard = document.getElementById('debt-card');
+            const debtText = document.getElementById('debt');
+            if (debtAmount > 0) {
+                debtText.innerText = formatCurrency(debtAmount);
+                debtCard.style.display = 'block';
+            } else {
+                debtCard.style.display = 'none';
+            }
+        }
+
+        function startEdit(index) {
+            editingIndex = index;
+            updateUI();
+        }
+
+        function saveEdit(index, newAmountString) {
+            if (newAmountString === null) return;
+            const newAmount = parseInt(newAmountString.replace(/\D/g, ''), 10);
+            if (!newAmountString.toString().trim() || isNaN(newAmount) || newAmount <= 0) {
+                alert('Số tiền phải là số dương hợp lệ.');
+                return;
+            }
+            transactions[index].amount = newAmount;
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            editingIndex = null;
+            updateUI();
+        }
+
+        function cancelEdit() {
+            editingIndex = null;
+            updateUI();
+        }
+
+        function removeTransaction(index) {
+            transactions.splice(index, 1);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateUI();
+        }
+
+        // 5. Hàm xử lý khi bấm nút "Thêm"
+        function addTransaction() {
+            // Kiểm tra xem người dùng có nhập thiếu thông tin không
+            if (text.value.trim() === '' || amount.value.trim() === '') {
+                alert('Vui lòng nhập đủ tên giao dịch và số tiền!');
+                return;
+            }
+
+            // Đóng gói thông tin vừa nhập thành một "Object"
+            const transaction = {
+                text: capitalizeFirstLetter(text.value),
+                amount: parseInt(amount.value),
+                type: type.value
+            };
+
+            // Thêm vào mảng dữ liệu
+            transactions.push(transaction);
+
+            // Lưu mảng này vào Local Storage của trình duyệt (Backend thu nhỏ)
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // Xóa trắng ô nhập liệu để nhập cái mới
+            text.value = '';
+            amount.value = '';
+            
+            // Yêu cầu cập nhật lại giao diện
+            updateUI();
+        }
+
+        // 6. Gắn hành động click cho nút "Thêm"
+        addBtn.addEventListener('click', addTransaction);
+
+        // 7. Gắn phím Enter cho ô nhập liệu để thêm giao dịch nhanh
+        text.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addTransaction();
+            }
+        });
+
+        amount.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addTransaction();
+            }
+        });
+
+        // 8. Chạy hàm cập nhật giao diện ngay khi web vừa load xong
+        updateUI();
+    </script>
+</body>
+</html>
