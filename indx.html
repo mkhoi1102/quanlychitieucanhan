@@ -6,9 +6,95 @@
     <title>Dashboard Chi Tiêu Cá Nhân</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; padding: 20px; }
+        :root {
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --surface-strong: #fdfdfd;
+            --text: #333333;
+            --muted: #7f8c8d;
+            --border: #ddd;
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --income: #3498db;
+            --expense: #e74c3c;
+            --debt: #f39c12;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; transition: background-color 0.3s ease, color 0.3s ease; }
+        .dark-mode {
+            --bg: #121417;
+            --surface: #1f2430;
+            --surface-strong: #2b3244;
+            --text: #f4f6f9;
+            --muted: #a3acb9;
+            --border: #394456;
+            --primary: #76d7a2;
+            --primary-dark: #5fb584;
+            --income: #65a8ff;
+            --expense: #ff7b88;
+            --debt: #f5c16f;
+            --shadow: rgba(0, 0, 0, 0.35);
+        }
         .container { max-width: 800px; margin: 0 auto; }
-        h1 { text-align: center; margin-bottom: 25px; color: #2c3e50; }
+        .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 25px; }
+        .header-row h1 { font-size: clamp(2.3rem, 4vw, 3.5rem); line-height: 1.05; margin: 0; color: var(--text); flex: 1 1 auto; min-width: 0; }
+        .header-row h1 span { display: inline-block; white-space: normal; }
+        .lang-selector-compact { flex-shrink: 0; }
+        .theme-toggle {
+            width: 66px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #fff9c4 0%, #ffef9f 50%, #ffe570 100%);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+        }
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 8px;
+            transform: translateY(-50%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='5' fill='%23FFDD57'/%3E%3Cg stroke='%23FFDD57' stroke-width='2'%3E%3Cline x1='12' y1='1' x2='12' y2='4'/%3E%3Cline x1='12' y1='20' x2='12' y2='23'/%3E%3Cline x1='4.22' y1='4.22' x2='6.34' y2='6.34'/%3E%3Cline x1='17.66' y1='17.66' x2='19.78' y2='19.78'/%3E%3Cline x1='1' y1='12' x2='4' y2='12'/%3E%3Cline x1='20' y1='12' x2='23' y2='12'/%3E%3Cline x1='4.22' y1='19.78' x2='6.34' y2='17.66'/%3E%3Cline x1='17.66' y1='6.34' x2='19.78' y2='4.22'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: left 0.3s ease, background-image 0.3s ease;
+        }
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #ffffff;
+            top: 50%;
+            left: 4px;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+            transition: left 0.3s ease, background 0.3s ease;
+        }
+        .theme-toggle.dark-active {
+            background: linear-gradient(135deg, #29364f 0%, #1f2840 100%);
+        }
+        .theme-toggle.dark-active::before {
+            left: calc(100% - 28px);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 14.73A8 8 0 0 1 9.27 4 9 9 0 1 0 20 14.73z' fill='%23FDE68A'/%3E%3C/svg%3E");
+        }
+        .theme-toggle.dark-active::after {
+            left: calc(100% - 32px);
+            background: #1f2430;
+        }
         
         /* Khu vực hiển thị số dư */
         .thong-ke { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
@@ -21,6 +107,7 @@
 
         /* Khu vực nhập liệu */
         .nhap-lieu { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .nhap-lieu h3 { color: #111111; }
         .form-group { display: flex; gap: 10px; margin-top: 10px; }
         input, select, button { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; outline: none; }
         input[type="text"] { flex: 2; }
@@ -49,52 +136,477 @@
         .edit-input { font-size: 16px; min-width: 120px; }
         .the.no-debt { border: 1px solid #f1c40f; }
         .debt { color: #f39c12; font-weight: bold; }
+
+        /* Language selector compact */
+        .lang-selector-compact {
+            padding: 4px 6px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            background: white;
+            min-width: 120px;
+            white-space: nowrap;
+            height: 32px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>📊 Quản Lý Chi Tiêu Cá Nhân</h1>
+        <div class="header-row">
+            <h1>📊 <span id="title">Quản Lý Chi Tiêu Cá Nhân</span></h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <select id="language-selector" class="lang-selector-compact">
+                    <option value="vi" data-i18n="languageVi">Việt</option>
+                    <option value="en" data-i18n="languageEn">English</option>
+                    <option value="fr" data-i18n="languageFr">Français</option>
+                    <option value="es" data-i18n="languageEs">Español</option>
+                    <option value="zh" data-i18n="languageZh">中文</option>
+                    <option value="ar" data-i18n="languageAr">العربية</option>
+                    <option value="hi" data-i18n="languageHi">हिन्दी</option>
+                    <option value="pt" data-i18n="languagePt">Português</option>
+                    <option value="ru" data-i18n="languageRu">Русский</option>
+                    <option value="ja" data-i18n="languageJa">日本語</option>
+                </select>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi sáng/tối"></button>
+            </div>
+        </div>
 
         <div class="thong-ke">
             <div class="the">
-                <h3>Số Dư Hiện Tại</h3>
+                <h3 data-i18n="balance">Số Dư Hiện Tại</h3>
                 <p class="so-du" id="balance">0 đ</p>
             </div>
             <div class="the">
-                <h3>Tổng Thu Nhập</h3>
+                <h3 data-i18n="income">Tổng Thu Nhập</h3>
                 <p class="thu-nhap" id="income">0 đ</p>
             </div>
             <div class="the no-debt" id="debt-card" style="display:none;">
-                <h3>Nợ Hiện Tại</h3>
+                <h3 data-i18n="debt">Nợ Hiện Tại</h3>
                 <p class="debt" id="debt">0 đ</p>
             </div>
             <div class="the">
-                <h3>Tổng Chi Tiêu</h3>
+                <h3 data-i18n="expense">Tổng Chi Tiêu</h3>
                 <p class="chi-tieu" id="expense">0 đ</p>
             </div>
         </div>
 
         <div class="nhap-lieu">
-            <h3>Thêm giao dịch mới</h3>
+            <h3 data-i18n="addTransaction">Thêm giao dịch mới</h3>
             <div class="form-group">
-                <input type="text" id="text" placeholder="Tên khoản chi (VD: Lương, Ăn uống...)">
-                <input type="number" id="amount" placeholder="Số tiền (đ)">
+                <input type="text" id="text" placeholder="Tên khoản chi (VD: Lương, Ăn uống...)" data-placeholder="transactionName">
+                <input type="number" id="amount" placeholder="Số tiền (đ)" data-placeholder="amount">
                 <select id="type">
-                    <option value="thu">Thu nhập (+)</option>
-                    <option value="chi">Chi tiêu (-)</option>
-                    <option value="vay">Vay nợ (-)</option>
+                    <option value="thu" data-i18n="typeIncome">Thu nhập (+)</option>
+                    <option value="chi" data-i18n="typeExpense">Chi tiêu (-)</option>
+                    <option value="vay" data-i18n="typeDebt">Vay nợ (-)</option>
                 </select>
-                <button id="add-btn">Thêm</button>
+                <button id="add-btn" data-i18n="add">Thêm</button>
             </div>
         </div>
 
         <div class="lich-su" id="list">
-            <h2>Lịch sử giao dịch gần đây</h2>
+            <h2 data-i18n="history">Lịch sử giao dịch gần đây</h2>
             </div>
     </div>
 
     <script>
+        // Language translations
+        const translations = {
+            vi: {
+                title: 'Quản Lý Chi Tiêu Cá Nhân',
+                balance: 'Số Dư Hiện Tại',
+                income: 'Tổng Thu Nhập',
+                expense: 'Tổng Chi Tiêu',
+                debt: 'Nợ Hiện Tại',
+                addTransaction: 'Thêm giao dịch mới',
+                transactionName: 'Tên khoản chi (VD: Lương, Ăn uống...)',
+                amount: 'Số tiền (đ)',
+                typeIncome: 'Thu nhập (+)',
+                typeExpense: 'Chi tiêu (-)',
+                typeDebt: 'Vay nợ (-)',
+                add: 'Thêm',
+                history: 'Lịch sử giao dịch gần đây',
+                save: 'Lưu',
+                cancel: 'Hủy',
+                edit: 'Sửa',
+                delete: 'Xóa',
+                currency: ' đ',
+                selfDebt: 'Nợ bản thân',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'Sáng / Tối',
+                errorEmpty: 'Vui lòng nhập đủ tên giao dịch và số tiền!',
+                errorAmount: 'Số tiền phải là số dương hợp lệ.',
+                errorDebt: 'Chi tiêu vượt quá số dư. Phần dư sẽ được ghi nhận là Nợ bản thân.'
+            },
+            en: {
+                title: 'Personal Expense Manager',
+                balance: 'Current Balance',
+                income: 'Total Income',
+                expense: 'Total Expense',
+                debt: 'Current Debt',
+                addTransaction: 'Add new transaction',
+                transactionName: 'Transaction name (Ex: Salary, Food...)',
+                amount: 'Amount ($)',
+                typeIncome: 'Income (+)',
+                typeExpense: 'Expense (-)',
+                typeDebt: 'Debt (-)',
+                add: 'Add',
+                history: 'Recent transaction history',
+                save: 'Save',
+                cancel: 'Cancel',
+                edit: 'Edit',
+                delete: 'Delete',
+                currency: ' $',
+                selfDebt: 'Personal debt',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'Light / Dark',
+                errorEmpty: 'Please enter both transaction name and amount!',
+                errorAmount: 'Amount must be a valid positive number.',
+                errorDebt: 'Expense exceeds balance. The remainder will be recorded as personal debt.'
+            },
+            fr: {
+                title: 'Gestionnaire de Dépenses Personnelles',
+                balance: 'Solde Actuel',
+                income: 'Revenu Total',
+                expense: 'Dépense Totale',
+                debt: 'Dette Actuelle',
+                addTransaction: 'Ajouter une nouvelle transaction',
+                transactionName: 'Nom de la transaction (Ex: Salaire, Nourriture...)',
+                amount: 'Montant (€)',
+                typeIncome: 'Revenu (+)',
+                typeExpense: 'Dépense (-)',
+                typeDebt: 'Dette (-)',
+                add: 'Ajouter',
+                history: 'Historique des transactions récentes',
+                save: 'Enregistrer',
+                cancel: 'Annuler',
+                edit: 'Modifier',
+                delete: 'Supprimer',
+                currency: ' €',
+                selfDebt: 'Dette personnelle',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'Clair / Sombre',
+                errorEmpty: 'Veuillez entrer le nom et le montant de la transaction!',
+                errorAmount: 'Le montant doit être un nombre positif valide.',
+                errorDebt: 'La dépense dépasse le solde. Le reste sera enregistré comme dette personnelle.'
+            },
+            es: {
+                title: 'Administrador de Gastos Personales',
+                balance: 'Saldo Actual',
+                income: 'Ingreso Total',
+                expense: 'Gasto Total',
+                debt: 'Deuda Actual',
+                addTransaction: 'Agregar nueva transacción',
+                transactionName: 'Nombre de la transacción (Ej: Sueldo, Comida...)',
+                amount: 'Monto ($)',
+                typeIncome: 'Ingreso (+)',
+                typeExpense: 'Gasto (-)',
+                typeDebt: 'Deuda (-)',
+                add: 'Agregar',
+                history: 'Historial de transacciones recientes',
+                save: 'Guardar',
+                cancel: 'Cancelar',
+                edit: 'Editar',
+                delete: 'Eliminar',
+                currency: ' $',
+                selfDebt: 'Deuda personal',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'Claro / Oscuro',
+                errorEmpty: 'Por favor ingrese nombre de la transacción y monto!',
+                errorAmount: 'El monto debe ser un número positivo válido.',
+                errorDebt: 'El gasto excede el saldo. El resto se registrará como deuda personal.'
+            },
+            zh: {
+                title: '个人支出管理',
+                balance: '当前余额',
+                income: '总收入',
+                expense: '总支出',
+                debt: '当前负债',
+                addTransaction: '添加新交易',
+                transactionName: '交易名称（例如：工资、餐饮...）',
+                amount: '金额（¥）',
+                typeIncome: '收入 (+)',
+                typeExpense: '支出 (-)',
+                typeDebt: '借款 (-)',
+                add: '添加',
+                history: '近期交易历史',
+                save: '保存',
+                cancel: '取消',
+                edit: '编辑',
+                delete: '删除',
+                currency: ' ¥',
+                selfDebt: '个人债务',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: '亮 / 暗',
+                errorEmpty: '请输入交易名称和金额！',
+                errorAmount: '金额必须是有效的正数。',
+                errorDebt: '支出超过余额。其余部分将记为个人债务。'
+            },
+            ar: {
+                title: 'مدير المصروفات الشخصية',
+                balance: 'الرصيد الحالي',
+                income: 'إجمالي الدخل',
+                expense: 'إجمالي المصروفات',
+                debt: 'الديون الحالية',
+                addTransaction: 'إضافة معاملة جديدة',
+                transactionName: 'اسم المعاملة (مثال: الراتب، الطعام...)',
+                amount: 'المبلغ ($)',
+                typeIncome: 'دخل (+)',
+                typeExpense: 'مصاريف (-)',
+                typeDebt: 'دين (-)',
+                add: 'إضافة',
+                history: 'سجل المعاملات الحديثة',
+                save: 'حفظ',
+                cancel: 'إلغاء',
+                edit: 'تعديل',
+                delete: 'حذف',
+                currency: ' $',
+                selfDebt: 'دين شخصي',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'فاتح / داكن',
+                errorEmpty: 'يرجى إدخال اسم المعاملة والمبلغ!',
+                errorAmount: 'يجب أن يكون المبلغ رقمًا موجبًا صالحًا.',
+                errorDebt: 'المصاريف تتجاوز الرصيد. سيتم تسجيل الباقي كدين شخصي.'
+            },
+            hi: {
+                title: 'व्यक्तिगत व्यय प्रबंधक',
+                balance: 'वर्तमान शेष',
+                income: 'कुल आय',
+                expense: 'कुल व्यय',
+                debt: 'वर्तमान ऋण',
+                addTransaction: 'नया लेनदेन जोड़ें',
+                transactionName: 'लेनदेन का नाम (जैसे: वेतन, भोजन...)',
+                amount: 'राशि (₹)',
+                typeIncome: 'आय (+)',
+                typeExpense: 'व्यय (-)',
+                typeDebt: 'ऋण (-)',
+                add: 'जोड़ें',
+                history: 'हाल के लेनदेन इतिहास',
+                save: 'सहेजें',
+                cancel: 'रद्द करें',
+                edit: 'संपादित करें',
+                delete: 'हटाएँ',
+                currency: ' ₹',
+                selfDebt: 'व्यक्तिगत ऋण',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'सॉफ्ट / डार्क',
+                errorEmpty: 'कृपया लेनदेन का नाम और राशि दर्ज करें!',
+                errorAmount: 'राशि मान्य सकारात्मक संख्या होनी चाहिए।',
+                errorDebt: 'व्यय शेष से अधिक है। शेष व्यक्तिगत ऋण के रूप में दर्ज किया जाएगा।'
+            },
+            pt: {
+                title: 'Gerenciador de Despesas Pessoais',
+                balance: 'Saldo Atual',
+                income: 'Renda Total',
+                expense: 'Despesa Total',
+                debt: 'Dívida Atual',
+                addTransaction: 'Adicionar nova transação',
+                transactionName: 'Nome da transação (Ex: Salário, Comida...)',
+                amount: 'Valor (€)',
+                typeIncome: 'Receita (+)',
+                typeExpense: 'Despesa (-)',
+                typeDebt: 'Dívida (-)',
+                add: 'Adicionar',
+                history: 'Histórico de transações recentes',
+                save: 'Salvar',
+                cancel: 'Cancelar',
+                edit: 'Editar',
+                delete: 'Excluir',
+                currency: ' €',
+                selfDebt: 'Dívida pessoal',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'Claro / Escuro',
+                errorEmpty: 'Por favor, insira nome da transação e valor!',
+                errorAmount: 'O valor deve ser um número positivo válido.',
+                errorDebt: 'A despesa excede o saldo. O restante será registrado como dívida pessoal.'
+            },
+            ru: {
+                title: 'Менеджер личных расходов',
+                balance: 'Текущий баланс',
+                income: 'Общий доход',
+                expense: 'Общие расходы',
+                debt: 'Текущий долг',
+                addTransaction: 'Добавить новую транзакцию',
+                transactionName: 'Название транзакции (Напр.: зарплата, еда...)',
+                amount: 'Сумма (₽)',
+                typeIncome: 'Доход (+)',
+                typeExpense: 'Расход (-)',
+                typeDebt: 'Долг (-)',
+                add: 'Добавить',
+                history: 'История последних транзакций',
+                save: 'Сохранить',
+                cancel: 'Отмена',
+                edit: 'Редактировать',
+                delete: 'Удалить',
+                currency: ' ₽',
+                selfDebt: 'Личный долг',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'Свет / Тьма',
+                errorEmpty: 'Пожалуйста, введите название транзакции и сумму!',
+                errorAmount: 'Сумма должна быть действительным положительным числом.',
+                errorDebt: 'Расход превышает баланс. Остаток будет записан как личный долг.'
+            },
+            ja: {
+                title: '個人支出マネージャー',
+                balance: '現在の残高',
+                income: '総収入',
+                expense: '総支出',
+                debt: '現在の負債',
+                addTransaction: '新しい取引を追加',
+                transactionName: '取引名（例：給与、食費...）',
+                amount: '金額（¥）',
+                typeIncome: '収入 (+)',
+                typeExpense: '支出 (-)',
+                typeDebt: '借入 (-)',
+                add: '追加',
+                history: '最近の取引履歴',
+                save: '保存',
+                cancel: 'キャンセル',
+                edit: '編集',
+                delete: '削除',
+                currency: ' ¥',
+                selfDebt: '個人の借金',
+                languageVi: '🇻🇳 Việt',
+                languageEn: '🇺🇸 English',
+                languageFr: '🇫🇷 Français',
+                languageEs: '🇪🇸 Español',
+                languageZh: '🇨🇳 中文',
+                languageAr: '🇸🇦 العربية',
+                languageHi: '🇮🇳 हिन्दी',
+                languagePt: '🇵🇹 Português',
+                languageRu: '🇷🇺 Русский',
+                languageJa: '🇯🇵 日本語',
+                toggleTheme: 'ライト / ダーク',
+                errorEmpty: '取引名と金額を入力してください！',
+                errorAmount: '金額は有効な正の数でなければなりません。',
+                errorDebt: '支出が残高を超えています。残りは個人の借金として記録されます。'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('selectedLanguage') || 'vi';
+
+        function t(key) {
+            return translations[currentLanguage][key] || translations['vi'][key];
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('selectedLanguage', lang);
+            updateLanguageUI();
+            updateUI();
+        }
+
+        function setTheme(theme) {
+            document.body.classList.toggle('dark-mode', theme === 'dark');
+            themeToggle.classList.toggle('dark-active', theme === 'dark');
+            localStorage.setItem('selectedTheme', theme);
+        }
+
+        function toggleTheme() {
+            const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+            setTheme(nextTheme);
+            updateLanguageUI();
+        }
+
+        function updateLanguageUI() {
+            document.getElementById('title').textContent = t('title');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            // Update placeholders
+            document.querySelectorAll('[data-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-placeholder');
+                el.placeholder = t(key);
+            });
+            // Update form button text
+            document.getElementById('add-btn').textContent = t('add');
+        }
+
         // 1. Lấy các phần tử trên giao diện để tương tác
         const balance = document.getElementById('balance');
         const income = document.getElementById('income');
@@ -104,6 +616,8 @@
         const amount = document.getElementById('amount');
         const type = document.getElementById('type');
         const addBtn = document.getElementById('add-btn');
+        const languageSelector = document.getElementById('language-selector');
+        const themeToggle = document.getElementById('theme-toggle');
 
         // 2. Lấy dữ liệu từ Local Storage (nếu chưa có thì tạo mảng rỗng [])
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -111,7 +625,11 @@
 
         // 3. Hàm định dạng tiền tệ (thêm dấu phẩy: 10,000,000)
         function formatCurrency(number) {
-            return number.toLocaleString('vi-VN') + ' đ';
+            const locales = { vi: 'vi-VN', en: 'en-US', fr: 'fr-FR', es: 'es-ES', zh: 'zh-CN', ar: 'ar-SA', hi: 'hi-IN', pt: 'pt-PT', ru: 'ru-RU', ja: 'ja-JP' };
+            const currencySymbols = { vi: ' đ', en: ' $', fr: ' €', es: ' $', zh: ' ¥', ar: ' د.إ', hi: ' ₹', pt: ' €', ru: ' ₽', ja: ' ¥' };
+            const locale = locales[currentLanguage] || 'vi-VN';
+            const symbol = currencySymbols[currentLanguage] || ' đ';
+            return number.toLocaleString(locale) + symbol;
         }
 
         // 4. Viết hoa chữ cái đầu của chuỗi
@@ -124,7 +642,7 @@
         // 5. Hàm cập nhật lại toàn bộ giao diện
         function updateUI() {
             // Xóa danh sách cũ đi để vẽ lại từ đầu
-            list.innerHTML = '<h2>Lịch sử giao dịch gần đây</h2>';
+            list.innerHTML = `<h2 data-i18n="history">${t('history')}</h2>`;
             let totalIncome = 0;
             let totalExpense = 0;
             let totalDebt = 0;
@@ -134,7 +652,7 @@
                 const isIncome = transaction.type === 'thu';
                 const isExpense = transaction.type === 'chi';
                 const isDebt = transaction.type === 'vay';
-                
+
                 if (isIncome) {
                     totalIncome += transaction.amount;
                 } else if (isExpense) {
@@ -170,12 +688,12 @@
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('save-btn');
-                    saveButton.innerText = 'Lưu';
+                    saveButton.innerText = t('save');
                     saveButton.addEventListener('click', () => saveEdit(index, editInput.value));
 
                     const cancelButton = document.createElement('button');
                     cancelButton.classList.add('cancel-btn');
-                    cancelButton.innerText = 'Hủy';
+                    cancelButton.innerText = t('cancel');
                     cancelButton.addEventListener('click', () => cancelEdit());
 
                     editGroup.appendChild(editInput);
@@ -190,12 +708,12 @@
                     `;
                     const editButton = document.createElement('button');
                     editButton.classList.add('edit-btn');
-                    editButton.innerText = 'Sửa';
+                    editButton.innerText = t('edit');
                     editButton.addEventListener('click', () => startEdit(index));
 
                     const deleteButton = document.createElement('button');
                     deleteButton.classList.add('delete-btn');
-                    deleteButton.innerText = 'Xóa';
+                    deleteButton.innerText = t('delete');
                     deleteButton.addEventListener('click', () => removeTransaction(index));
 
                     item.appendChild(editButton);
@@ -228,7 +746,7 @@
             if (newAmountString === null) return;
             const newAmount = parseInt(newAmountString.replace(/\D/g, ''), 10);
             if (!newAmountString.toString().trim() || isNaN(newAmount) || newAmount <= 0) {
-                alert('Số tiền phải là số dương hợp lệ.');
+                alert(t('errorAmount'));
                 return;
             }
             transactions[index].amount = newAmount;
@@ -252,13 +770,13 @@
         function addTransaction() {
             // Kiểm tra xem người dùng có nhập thiếu thông tin không
             if (text.value.trim() === '' || amount.value.trim() === '') {
-                alert('Vui lòng nhập đủ tên giao dịch và số tiền!');
+                alert(t('errorEmpty'));
                 return;
             }
 
             const enteredAmount = parseInt(amount.value, 10);
             if (isNaN(enteredAmount) || enteredAmount <= 0) {
-                alert('Số tiền phải là số dương hợp lệ.');
+                alert(t('errorAmount'));
                 return;
             }
 
@@ -275,10 +793,10 @@
 
                 if (transaction.amount > currentBalance) {
                     const debtAmount = currentBalance > 0 ? transaction.amount - currentBalance : transaction.amount;
-                    alert('Chi tiêu vượt quá số dư. Phần dư sẽ được ghi nhận là Nợ bản thân.');
+                    alert(t('errorDebt'));
                     transactions.push(transaction);
                     transactions.push({
-                        text: 'Nợ bản thân',
+                        text: t('selfDebt'),
                         amount: debtAmount,
                         type: 'vay'
                     });
@@ -291,17 +809,42 @@
 
             // Lưu mảng này vào Local Storage của trình duyệt (Backend thu nhỏ)
             localStorage.setItem('transactions', JSON.stringify(transactions));
-            
+
             // Xóa trắng ô nhập liệu để nhập cái mới
             text.value = '';
             amount.value = '';
-            
+
             // Yêu cầu cập nhật lại giao diện
             updateUI();
         }
 
         // 6. Gắn hành động click cho nút "Thêm"
         addBtn.addEventListener('click', addTransaction);
+
+        // Language selector event listener
+        languageSelector.addEventListener('change', (e) => {
+            setLanguage(e.target.value);
+        });
+
+        // Theme switcher event listener
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Set initial language selector value
+        languageSelector.value = currentLanguage;
+
+        // Set initial theme from Local Storage
+        const savedTheme = localStorage.getItem('selectedTheme') || 'light';
+        setTheme(savedTheme);
+
+        // Function to create compact language selector
+        function createCompactLangSelector(id, options = ['vi', 'en', 'fr', 'es', 'zh', 'ar', 'hi', 'pt', 'ru', 'ja']) {
+            const selector = document.getElementById(id);
+            if (!selector) return null;
+            selector.classList.add('lang-selector-compact');
+            selector.addEventListener('change', (e) => setLanguage(e.target.value));
+            selector.value = currentLanguage;
+            return selector;
+        }
 
         // 7. Gắn phím Enter cho ô nhập liệu để thêm giao dịch nhanh
         text.addEventListener('keydown', event => {
@@ -319,6 +862,8 @@
         });
 
         // 8. Chạy hàm cập nhật giao diện ngay khi web vừa load xong
+        createCompactLangSelector('language-selector');
+        updateLanguageUI();
         updateUI();
     </script>
 </body>
