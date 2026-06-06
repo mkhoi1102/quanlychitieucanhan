@@ -36,8 +36,9 @@
             --shadow: rgba(0, 0, 0, 0.35);
         }
         .container { max-width: 800px; margin: 0 auto; }
-        .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 25px; }
-        .header-row h1 { font-size: clamp(2.3rem, 4vw, 3.5rem); line-height: 1.05; margin: 0; color: var(--text); flex: 1 1 auto; min-width: 0; }
+        .header-row { position: relative; display: block; margin-bottom: 25px; padding-right: 220px; min-height: 72px; }
+        .header-row h1 { font-size: clamp(2.3rem, 4vw, 3.5rem); line-height: 1.05; margin: 0; color: var(--text); text-align: center; display: inline-flex; align-items: center; justify-content: center; width: 100%; }
+        .header-controls { position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
         .header-row h1 span { display: inline-block; white-space: normal; }
         .lang-selector-compact { flex-shrink: 0; }
         .theme-toggle {
@@ -168,7 +169,7 @@
     <div class="container">
         <div class="header-row">
             <h1>📊 <span id="title">Quản Lý Chi Tiêu Cá Nhân</span></h1>
-            <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="header-controls">
                 <select id="language-selector" class="lang-selector-compact">
                     <option value="vi" data-i18n="languageVi">Việt</option>
                     <option value="en" data-i18n="languageEn">English</option>
@@ -221,7 +222,7 @@
             <div class="form-group">
                 <input type="text" id="text" placeholder="Tên khoản chi (VD: Lương, Ăn uống...)" data-placeholder="transactionName">
                 <input type="number" id="amount" placeholder="Số tiền (đ)" data-placeholder="amount">
-                <input type="date" id="date" aria-label="Date">
+                <input type="date" id="date" aria-label="Date" min="1990-01-01" max="2100-12-31">
                 <select id="type">
                     <option value="thu" data-i18n="typeIncome">Thu nhập (+)</option>
                     <option value="chi" data-i18n="typeExpense">Chi tiêu (-)</option>
@@ -250,6 +251,9 @@
                 expense: 'Tổng Chi Tiêu',
                 debt: 'Nợ Hiện Tại',
                 chartTitle: 'Tổng quan chi tiêu',
+                sliceIncome: 'Thu',
+                sliceExpense: 'Chi',
+                sliceDebt: 'Nợ',
                 addTransaction: 'Thêm giao dịch mới',
                 transactionName: 'Tên khoản chi (VD: Lương, Ăn uống...)',
                 amount: 'Số tiền (đ)',
@@ -277,7 +281,10 @@
                 toggleTheme: 'Sáng / Tối',
                 errorEmpty: 'Vui lòng nhập đủ tên giao dịch và số tiền!',
                 errorAmount: 'Số tiền phải là số dương hợp lệ.',
-                errorDebt: 'Chi tiêu vượt quá số dư. Phần dư sẽ được ghi nhận là Nợ bản thân.'
+                errorDebt: 'Chi tiêu vượt quá số dư. Phần dư sẽ được ghi nhận là Nợ bản thân.',
+                errorFutureDate: 'Ngày không được lớn hơn hôm nay.',
+                errorDateRange: 'Năm phải nằm trong khoảng 1990 đến 2100.',
+                noTransactions: 'Hiện chưa có giao dịch để xóa.'
             },
             en: {
                 title: 'Personal Expense Manager',
@@ -286,6 +293,9 @@
                 expense: 'Total Expense',
                 debt: 'Current Debt',
                 chartTitle: 'Expense Summary',
+                sliceIncome: 'Income',
+                sliceExpense: 'Expense',
+                sliceDebt: 'Debt',
                 addTransaction: 'Add new transaction',
                 transactionName: 'Transaction name (Ex: Salary, Food...)',
                 amount: 'Amount ($)',
@@ -313,7 +323,10 @@
                 toggleTheme: 'Light / Dark',
                 errorEmpty: 'Please enter both transaction name and amount!',
                 errorAmount: 'Amount must be a valid positive number.',
-                errorDebt: 'Expense exceeds balance. The remainder will be recorded as personal debt.'
+                errorDebt: 'Expense exceeds balance. The remainder will be recorded as personal debt.',
+                errorFutureDate: 'Date cannot be in the future.',
+                errorDateRange: 'Year must be between 1990 and 2100.',
+                noTransactions: 'No transactions available to clear.'
             },
             fr: {
                 title: 'Gestionnaire de Dépenses Personnelles',
@@ -322,6 +335,9 @@
                 expense: 'Dépense Totale',
                 debt: 'Dette Actuelle',
                 chartTitle: 'Aperçu des dépenses',
+                sliceIncome: 'Revenu',
+                sliceExpense: 'Dépense',
+                sliceDebt: 'Dette',
                 addTransaction: 'Ajouter une nouvelle transaction',
                 transactionName: 'Nom de la transaction (Ex: Salaire, Nourriture...)',
                 amount: 'Montant (€)',
@@ -349,7 +365,9 @@
                 toggleTheme: 'Clair / Sombre',
                 errorEmpty: 'Veuillez entrer le nom et le montant de la transaction!',
                 errorAmount: 'Le montant doit être un nombre positif valide.',
-                errorDebt: 'La dépense dépasse le solde. Le reste sera enregistré comme dette personnelle.'
+                errorDebt: 'La dépense dépasse le solde. Le reste sera enregistré comme dette personnelle.',
+                errorFutureDate: 'La date ne peut pas être dans le futur.',
+                errorDateRange: "L'année doit être comprise entre 1990 et 2100."
             },
             es: {
                 title: 'Administrador de Gastos Personales',
@@ -358,6 +376,9 @@
                 expense: 'Gasto Total',
                 debt: 'Deuda Actual',
                 chartTitle: 'Resumen de gastos',
+                sliceIncome: 'Ingreso',
+                sliceExpense: 'Gasto',
+                sliceDebt: 'Deuda',
                 addTransaction: 'Agregar nueva transacción',
                 transactionName: 'Nombre de la transacción (Ej: Sueldo, Comida...)',
                 amount: 'Monto ($)',
@@ -385,7 +406,9 @@
                 toggleTheme: 'Claro / Oscuro',
                 errorEmpty: 'Por favor ingrese nombre de la transacción y monto!',
                 errorAmount: 'El monto debe ser un número positivo válido.',
-                errorDebt: 'El gasto excede el saldo. El resto se registrará como deuda personal.'
+                errorDebt: 'El gasto excede el saldo. El resto se registrará como deuda personal.',
+                errorFutureDate: 'La fecha no puede estar en el futuro.',
+                errorDateRange: 'El año debe estar entre 1990 y 2100.'
             },
             zh: {
                 title: '个人支出管理',
@@ -394,6 +417,9 @@
                 expense: '总支出',
                 debt: '当前负债',
                 chartTitle: '支出概览',
+                sliceIncome: '收入',
+                sliceExpense: '支出',
+                sliceDebt: '负债',
                 addTransaction: '添加新交易',
                 transactionName: '交易名称（例如：工资、餐饮...）',
                 amount: '金额（¥）',
@@ -421,7 +447,9 @@
                 toggleTheme: '亮 / 暗',
                 errorEmpty: '请输入交易名称和金额！',
                 errorAmount: '金额必须是有效的正数。',
-                errorDebt: '支出超过余额。其余部分将记为个人债务。'
+                errorDebt: '支出超过余额。其余部分将记为个人债务。',
+                errorFutureDate: '日期不能超过今天。',
+                errorDateRange: '年份必须在 1990 到 2100 之间。'
             },
             ar: {
                 title: 'مدير المصروفات الشخصية',
@@ -430,6 +458,9 @@
                 expense: 'إجمالي المصروفات',
                 debt: 'الديون الحالية',
                 chartTitle: 'لمحة عامة عن المصروفات',
+                sliceIncome: 'دخل',
+                sliceExpense: 'مصروف',
+                sliceDebt: 'دين',
                 addTransaction: 'إضافة معاملة جديدة',
                 transactionName: 'اسم المعاملة (مثال: الراتب، الطعام...)',
                 amount: 'المبلغ ($)',
@@ -457,7 +488,9 @@
                 toggleTheme: 'فاتح / داكن',
                 errorEmpty: 'يرجى إدخال اسم المعاملة والمبلغ!',
                 errorAmount: 'يجب أن يكون المبلغ رقمًا موجبًا صالحًا.',
-                errorDebt: 'المصاريف تتجاوز الرصيد. سيتم تسجيل الباقي كدين شخصي.'
+                errorDebt: 'المصاريف تتجاوز الرصيد. سيتم تسجيل الباقي كدين شخصي.',
+                errorFutureDate: 'لا يمكن أن يكون التاريخ في المستقبل.',
+                errorDateRange: 'يجب أن يكون العام بين 1990 و 2100.'
             },
             hi: {
                 title: 'व्यक्तिगत व्यय प्रबंधक',
@@ -466,6 +499,9 @@
                 expense: 'कुल व्यय',
                 debt: 'वर्तमान ऋण',
                 chartTitle: 'व्यय सारांश',
+                sliceIncome: 'आय',
+                sliceExpense: 'व्यय',
+                sliceDebt: 'ऋण',
                 addTransaction: 'नया लेनदेन जोड़ें',
                 transactionName: 'लेनदेन का नाम (जैसे: वेतन, भोजन...)',
                 amount: 'राशि (₹)',
@@ -493,7 +529,9 @@
                 toggleTheme: 'सॉफ्ट / डार्क',
                 errorEmpty: 'कृपया लेनदेन का नाम और राशि दर्ज करें!',
                 errorAmount: 'राशि मान्य सकारात्मक संख्या होनी चाहिए।',
-                errorDebt: 'व्यय शेष से अधिक है। शेष व्यक्तिगत ऋण के रूप में दर्ज किया जाएगा।'
+                errorDebt: 'व्यय शेष से अधिक है। शेष व्यक्तिगत ऋण के रूप में दर्ज किया जाएगा।',
+                errorFutureDate: 'तारीख भविष्य में नहीं हो सकती।',
+                errorDateRange: 'वर्ष 1990 से 2100 के बीच होना चाहिए।'
             },
             pt: {
                 title: 'Gerenciador de Despesas Pessoais',
@@ -502,6 +540,9 @@
                 expense: 'Despesa Total',
                 debt: 'Dívida Atual',
                 chartTitle: 'Resumo de despesas',
+                sliceIncome: 'Receita',
+                sliceExpense: 'Despesa',
+                sliceDebt: 'Dívida',
                 addTransaction: 'Adicionar nova transação',
                 transactionName: 'Nome da transação (Ex: Salário, Comida...)',
                 amount: 'Valor (€)',
@@ -529,7 +570,9 @@
                 toggleTheme: 'Claro / Escuro',
                 errorEmpty: 'Por favor, insira nome da transação e valor!',
                 errorAmount: 'O valor deve ser um número positivo válido.',
-                errorDebt: 'A despesa excede o saldo. O restante será registrado como dívida pessoal.'
+                errorDebt: 'A despesa excede o saldo. O restante será registrado como dívida pessoal.',
+                errorFutureDate: 'A data não pode estar no futuro.',
+                errorDateRange: 'O ano deve ser entre 1990 e 2100.'
             },
             ru: {
                 title: 'Менеджер личных расходов',
@@ -538,6 +581,9 @@
                 expense: 'Общие расходы',
                 debt: 'Текущий долг',
                 chartTitle: 'Обзор расходов',
+                sliceIncome: 'Доход',
+                sliceExpense: 'Расход',
+                sliceDebt: 'Долг',
                 addTransaction: 'Добавить новую транзакцию',
                 transactionName: 'Название транзакции (Напр.: зарплата, еда...)',
                 amount: 'Сумма (₽)',
@@ -565,7 +611,9 @@
                 toggleTheme: 'Свет / Тьма',
                 errorEmpty: 'Пожалуйста, введите название транзакции и сумму!',
                 errorAmount: 'Сумма должна быть действительным положительным числом.',
-                errorDebt: 'Расход превышает баланс. Остаток будет записан как личный долг.'
+                errorDebt: 'Расход превышает баланс. Остаток будет записан как личный долг.',
+                errorFutureDate: 'Дата не может быть в будущем.',
+                errorDateRange: 'Год должен быть в диапазоне от 1990 до 2100.'
             },
             ja: {
                 title: '個人支出マネージャー',
@@ -574,6 +622,9 @@
                 expense: '総支出',
                 debt: '現在の負債',
                 chartTitle: '支出概要',
+                sliceIncome: '収入',
+                sliceExpense: '支出',
+                sliceDebt: '借金',
                 addTransaction: '新しい取引を追加',
                 transactionName: '取引名（例：給与、食費...）',
                 amount: '金額（¥）',
@@ -601,7 +652,9 @@
                 toggleTheme: 'ライト / ダーク',
                 errorEmpty: '取引名と金額を入力してください！',
                 errorAmount: '金額は有効な正の数でなければなりません。',
-                errorDebt: '支出が残高を超えています。残りは個人の借金として記録されます。'
+                errorDebt: '支出が残高を超えています。残りは個人の借金として記録されます。',
+                errorFutureDate: '日付は未来にできません。',
+                errorDateRange: '年は1990年から2100年の間である必要があります。'
             }
         };
 
@@ -682,6 +735,74 @@
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
+        function parseTransactionDate(value) {
+            if (!value) return new Date();
+            const [year, month, day] = value.split('-').map(Number);
+            if (!year || !month || !day) return new Date(value);
+            return new Date(year, month - 1, day);
+        }
+
+        function getLocaleForDate() {
+            const locales = {
+                vi: 'vi-VN', en: 'en-US', fr: 'fr-FR', es: 'es-ES', zh: 'zh-CN', ar: 'ar-SA', hi: 'hi-IN', pt: 'pt-PT', ru: 'ru-RU', ja: 'ja-JP'
+            };
+            return locales[currentLanguage] || 'vi-VN';
+        }
+
+        function formatDisplayDate(value) {
+            const date = parseTransactionDate(value);
+            if (isNaN(date.getTime())) return value || '';
+            return date.toLocaleDateString(getLocaleForDate(), { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function isFutureDate(value) {
+            const inputDate = parseTransactionDate(value);
+            const today = parseTransactionDate(getTodayDate());
+            return inputDate > today;
+        }
+
+        function isDateInRange(value) {
+            const inputDate = parseTransactionDate(value);
+            const minDate = parseTransactionDate('1990-01-01');
+            const maxDate = parseTransactionDate('2100-12-31');
+            return inputDate >= minDate && inputDate <= maxDate;
+        }
+
+        function clampTransactionDate(value) {
+            const inputDate = parseTransactionDate(value);
+            const minDate = parseTransactionDate('1990-01-01');
+            const maxDate = parseTransactionDate('2100-12-31');
+            if (isNaN(inputDate.getTime())) return value;
+            if (inputDate < minDate) return '1990-01-01';
+            if (inputDate > maxDate) return '2100-12-31';
+            return value;
+        }
+
+        function clampDateInputValue(value) {
+            if (!value) return value;
+            const isoMatch = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(value);
+            if (!isoMatch) {
+                const yearOnlyMatch = /^([0-9]{4})$/.exec(value);
+                if (yearOnlyMatch) {
+                    const year = Number(yearOnlyMatch[1]);
+                    if (year > 2200) return '2100-12-31';
+                    if (year < 1990) return '1990-01-01';
+                }
+                return value;
+            }
+            let year = Number(isoMatch[1]);
+            const month = Number(isoMatch[2]);
+            const day = Number(isoMatch[3]);
+            if (year > 2200) year = 2100;
+            if (year < 1990) year = 1990;
+            const normalized = new Date(year, month - 1, day);
+            if (isNaN(normalized.getTime())) return value;
+            const y = String(normalized.getFullYear()).padStart(4, '0');
+            const m = String(normalized.getMonth() + 1).padStart(2, '0');
+            const d = String(normalized.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
         // 5. Hàm cập nhật lại toàn bộ giao diện
         function updateUI() {
             // Xóa danh sách cũ đi để vẽ lại từ đầu
@@ -689,6 +810,9 @@
             let totalIncome = 0;
             let totalExpense = 0;
             let totalDebt = 0;
+
+            // Sắp xếp giao dịch theo ngày giảm dần để thể hiện đúng thứ tự thực tế
+            transactions.sort((a, b) => parseTransactionDate(b.date) - parseTransactionDate(a.date));
 
             // Duyệt qua từng giao dịch để tính toán và in ra màn hình
             transactions.forEach((transaction, index) => {
@@ -748,7 +872,7 @@
                     item.innerHTML = `
                         <div>
                             <span>${capitalizeFirstLetter(transaction.text)}</span>
-                            <div class="date-text">${transaction.date || ''}</div>
+                            <div class="date-text">${formatDisplayDate(transaction.date)}</div>
                         </div>
                         <span style="color: ${color}; font-weight: bold;">${sign}${formatCurrency(transaction.amount)}</span>
                     `;
@@ -842,14 +966,14 @@
             chartCtx.stroke();
 
             const labels = [
-                { text: t('income'), value: totalIncome, color: colors[0] },
-                { text: t('expense'), value: totalExpense, color: colors[1] },
-                { text: t('debt'), value: totalDebt, color: colors[2] }
+                { text: t('income'), shortText: t('sliceIncome'), value: totalIncome, color: colors[0] },
+                { text: t('expense'), shortText: t('sliceExpense'), value: totalExpense, color: colors[1] },
+                { text: t('debt'), shortText: t('sliceDebt'), value: totalDebt, color: colors[2] }
             ];
 
             chartCtx.textAlign = 'center';
             chartCtx.textBaseline = 'middle';
-            chartCtx.font = 'bold 11px Arial, sans-serif';
+            chartCtx.font = 'bold 10px Arial, sans-serif';
 
             let labelAngle = -Math.PI / 2;
             labels.forEach((item) => {
@@ -862,18 +986,19 @@
                 const labelRadius = radius * 0.55;
                 const x = width / 2 + Math.cos(midAngle) * labelRadius;
                 const y = height / 2 + Math.sin(midAngle) * labelRadius;
-                const labelText = `${Math.round(item.value / totalSum * 100)}%`;
+                const percentage = Math.round(item.value / totalSum * 100);
+                const labelText = `${item.shortText} ${percentage}%`;
                 const textWidth = chartCtx.measureText(labelText).width;
-                const paddingX = 10;
-                const paddingY = 6;
+                const paddingX = 8;
+                const paddingY = 5;
                 const boxWidth = textWidth + paddingX * 2;
-                const boxHeight = 22;
+                const boxHeight = 20;
                 const boxX = x - boxWidth / 2;
                 const boxY = y - boxHeight / 2;
 
                 chartCtx.fillStyle = item.color;
                 chartCtx.fillRect(boxX, boxY, boxWidth, boxHeight);
-                chartCtx.fillStyle = '#000000';
+                chartCtx.fillStyle = '#ffffff';
                 chartCtx.fillText(labelText, x, y);
 
                 labelAngle += slice;
@@ -892,7 +1017,10 @@
         }
 
         function clearAllTransactions() {
-            if (!transactions.length) return;
+            if (!transactions.length) {
+                alert(t('noTransactions'));
+                return;
+            }
             const confirmation = confirm(t('confirmClearAll') || 'Bạn có chắc muốn xóa tất cả giao dịch?');
             if (!confirmation) return;
             transactions = [];
@@ -930,10 +1058,25 @@
                 return;
             }
 
+            let enteredDate = date.value.trim() || getTodayDate();
+            enteredDate = clampTransactionDate(enteredDate);
+            if (!isDateInRange(enteredDate)) {
+                alert(t('errorDateRange'));
+                isAddingTransaction = false;
+                addBtn.disabled = false;
+                return;
+            }
+            if (isFutureDate(enteredDate)) {
+                alert(t('errorFutureDate'));
+                isAddingTransaction = false;
+                addBtn.disabled = false;
+                return;
+            }
+
             const transaction = {
                 text: capitalizeFirstLetter(text.value),
                 amount: enteredAmount,
-                date: date.value || getTodayDate(),
+                date: enteredDate,
                 type: type.value
             };
 
@@ -1000,6 +1143,12 @@
 
         // Set current date for the date input
         date.value = getTodayDate();
+        date.addEventListener('input', () => {
+            date.value = clampDateInputValue(date.value);
+        });
+        date.addEventListener('change', () => {
+            date.value = clampTransactionDate(date.value);
+        });
 
         // Function to create compact language selector
         function createCompactLangSelector(id, options = ['vi', 'en', 'fr', 'es', 'zh', 'ar', 'hi', 'pt', 'ru', 'ja']) {
