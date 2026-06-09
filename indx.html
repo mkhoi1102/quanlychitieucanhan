@@ -120,12 +120,16 @@
         /* Danh sách lịch sử */
         .lich-su { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .lich-su h2 { margin-bottom: 15px; font-size: 18px; color: #2c3e50; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; font-size: 16px; gap: 12px; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; font-size: 16px; gap: 12px; color: #000; }
         .item:last-child { border-bottom: none; }
         .item span { display: inline-block; }
         .item span:first-child { font-size: 16px; flex: 1; }
         .item span:last-child { font-size: 18px; min-width: 120px; text-align: right; }
         .date-text { display: block; color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+        .dark-mode .lich-su .item,
+        .dark-mode .lich-su .item span:first-child,
+        .dark-mode .lich-su h2 { color: #000000; }
+        .dark-mode .lich-su .date-text { color: #333333; }
         .chart-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
         .chart-card h2 { margin-bottom: 18px; font-size: 18px; color: #2c3e50; }
         .chart-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; justify-content: space-between; }
@@ -235,7 +239,7 @@
         <div class="lich-su">
             <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 12px;">
                 <h2 data-i18n="history">Lịch sử giao dịch gần đây</h2>
-                <button id="clear-all-btn" class="delete-btn" style="margin:0; font-size:0.95rem; padding: 8px 12px;">Xóa tất cả</button>
+                <button id="clear-all-btn" class="delete-btn" style="margin:0; font-size:0.95rem; padding: 8px 12px;" data-i18n="clearAll">Xóa tất cả</button>
             </div>
             <div id="list"></div>
         </div>
@@ -266,6 +270,7 @@
                 cancel: 'Hủy',
                 edit: 'Sửa',
                 delete: 'Xóa',
+                clearAll: 'Xóa tất cả',
                 currency: ' đ',
                 selfDebt: 'Nợ bản thân',
                 languageVi: '🇻🇳 Việt',
@@ -284,6 +289,7 @@
                 errorDebt: 'Chi tiêu vượt quá số dư. Phần dư sẽ được ghi nhận là Nợ bản thân.',
                 errorFutureDate: 'Ngày không được lớn hơn hôm nay.',
                 errorDateRange: 'Năm phải nằm trong khoảng 1990 đến 2100.',
+                confirmClearAll: 'Bạn có chắc muốn xóa tất cả giao dịch?',
                 noTransactions: 'Hiện chưa có giao dịch để xóa.'
             },
             en: {
@@ -308,6 +314,7 @@
                 cancel: 'Cancel',
                 edit: 'Edit',
                 delete: 'Delete',
+                clearAll: 'Clear all',
                 currency: ' $',
                 selfDebt: 'Personal debt',
                 languageVi: '🇻🇳 Việt',
@@ -350,6 +357,7 @@
                 cancel: 'Annuler',
                 edit: 'Modifier',
                 delete: 'Supprimer',
+                clearAll: 'Tout supprimer',
                 currency: ' €',
                 selfDebt: 'Dette personnelle',
                 languageVi: '🇻🇳 Việt',
@@ -367,7 +375,8 @@
                 errorAmount: 'Le montant doit être un nombre positif valide.',
                 errorDebt: 'La dépense dépasse le solde. Le reste sera enregistré comme dette personnelle.',
                 errorFutureDate: 'La date ne peut pas être dans le futur.',
-                errorDateRange: "L'année doit être comprise entre 1990 et 2100."
+                errorDateRange: "L'année doit être comprise entre 1990 et 2100.",
+                confirmClearAll: 'Êtes-vous sûr de vouloir supprimer toutes les transactions ?'
             },
             es: {
                 title: 'Administrador de Gastos Personales',
@@ -391,6 +400,7 @@
                 cancel: 'Cancelar',
                 edit: 'Editar',
                 delete: 'Eliminar',
+                clearAll: 'Borrar todo',
                 currency: ' $',
                 selfDebt: 'Deuda personal',
                 languageVi: '🇻🇳 Việt',
@@ -408,7 +418,8 @@
                 errorAmount: 'El monto debe ser un número positivo válido.',
                 errorDebt: 'El gasto excede el saldo. El resto se registrará como deuda personal.',
                 errorFutureDate: 'La fecha no puede estar en el futuro.',
-                errorDateRange: 'El año debe estar entre 1990 y 2100.'
+                errorDateRange: 'El año debe estar entre 1990 y 2100.',
+                confirmClearAll: '¿Estás seguro de que deseas borrar todas las transacciones?'
             },
             zh: {
                 title: '个人支出管理',
@@ -432,6 +443,7 @@
                 cancel: '取消',
                 edit: '编辑',
                 delete: '删除',
+                clearAll: '清除全部',
                 currency: ' ¥',
                 selfDebt: '个人债务',
                 languageVi: '🇻🇳 Việt',
@@ -449,7 +461,8 @@
                 errorAmount: '金额必须是有效的正数。',
                 errorDebt: '支出超过余额。其余部分将记为个人债务。',
                 errorFutureDate: '日期不能超过今天。',
-                errorDateRange: '年份必须在 1990 到 2100 之间。'
+                errorDateRange: '年份必须在 1990 到 2100 之间。',
+                confirmClearAll: '您确定要清除所有交易吗？'
             },
             ar: {
                 title: 'مدير المصروفات الشخصية',
@@ -473,6 +486,7 @@
                 cancel: 'إلغاء',
                 edit: 'تعديل',
                 delete: 'حذف',
+                clearAll: 'مسح الكل',
                 currency: ' $',
                 selfDebt: 'دين شخصي',
                 languageVi: '🇻🇳 Việt',
@@ -490,7 +504,8 @@
                 errorAmount: 'يجب أن يكون المبلغ رقمًا موجبًا صالحًا.',
                 errorDebt: 'المصاريف تتجاوز الرصيد. سيتم تسجيل الباقي كدين شخصي.',
                 errorFutureDate: 'لا يمكن أن يكون التاريخ في المستقبل.',
-                errorDateRange: 'يجب أن يكون العام بين 1990 و 2100.'
+                errorDateRange: 'يجب أن يكون العام بين 1990 و 2100.',
+                confirmClearAll: 'هل أنت متأكد أنك تريد مسح جميع المعاملات؟'
             },
             hi: {
                 title: 'व्यक्तिगत व्यय प्रबंधक',
@@ -514,6 +529,7 @@
                 cancel: 'रद्द करें',
                 edit: 'संपादित करें',
                 delete: 'हटाएँ',
+                clearAll: 'सभी साफ़ करें',
                 currency: ' ₹',
                 selfDebt: 'व्यक्तिगत ऋण',
                 languageVi: '🇻🇳 Việt',
@@ -531,7 +547,8 @@
                 errorAmount: 'राशि मान्य सकारात्मक संख्या होनी चाहिए।',
                 errorDebt: 'व्यय शेष से अधिक है। शेष व्यक्तिगत ऋण के रूप में दर्ज किया जाएगा।',
                 errorFutureDate: 'तारीख भविष्य में नहीं हो सकती।',
-                errorDateRange: 'वर्ष 1990 से 2100 के बीच होना चाहिए।'
+                errorDateRange: 'वर्ष 1990 से 2100 के बीच होना चाहिए।',
+                confirmClearAll: 'क्या आप सभी लेन-देन साफ़ करना चाहते हैं?'
             },
             pt: {
                 title: 'Gerenciador de Despesas Pessoais',
@@ -555,6 +572,7 @@
                 cancel: 'Cancelar',
                 edit: 'Editar',
                 delete: 'Excluir',
+                clearAll: 'Limpar tudo',
                 currency: ' €',
                 selfDebt: 'Dívida pessoal',
                 languageVi: '🇻🇳 Việt',
@@ -572,7 +590,8 @@
                 errorAmount: 'O valor deve ser um número positivo válido.',
                 errorDebt: 'A despesa excede o saldo. O restante será registrado como dívida pessoal.',
                 errorFutureDate: 'A data não pode estar no futuro.',
-                errorDateRange: 'O ano deve ser entre 1990 e 2100.'
+                errorDateRange: 'O ano deve ser entre 1990 e 2100.',
+                confirmClearAll: 'Tem certeza de que deseja limpar todas as transações?'
             },
             ru: {
                 title: 'Менеджер личных расходов',
@@ -596,6 +615,7 @@
                 cancel: 'Отмена',
                 edit: 'Редактировать',
                 delete: 'Удалить',
+                clearAll: 'Удалить все',
                 currency: ' ₽',
                 selfDebt: 'Личный долг',
                 languageVi: '🇻🇳 Việt',
@@ -613,7 +633,8 @@
                 errorAmount: 'Сумма должна быть действительным положительным числом.',
                 errorDebt: 'Расход превышает баланс. Остаток будет записан как личный долг.',
                 errorFutureDate: 'Дата не может быть в будущем.',
-                errorDateRange: 'Год должен быть в диапазоне от 1990 до 2100.'
+                errorDateRange: 'Год должен быть в диапазоне от 1990 до 2100.',
+                confirmClearAll: 'Вы уверены, что хотите удалить все транзакции?'
             },
             ja: {
                 title: '個人支出マネージャー',
@@ -637,6 +658,7 @@
                 cancel: 'キャンセル',
                 edit: '編集',
                 delete: '削除',
+                clearAll: 'すべて削除',
                 currency: ' ¥',
                 selfDebt: '個人の借金',
                 languageVi: '🇻🇳 Việt',
@@ -654,7 +676,8 @@
                 errorAmount: '金額は有効な正の数でなければなりません。',
                 errorDebt: '支出が残高を超えています。残りは個人の借金として記録されます。',
                 errorFutureDate: '日付は未来にできません。',
-                errorDateRange: '年は1990年から2100年の間である必要があります。'
+                errorDateRange: '年は1990年から2100年の間である必要があります。',
+                confirmClearAll: 'すべての取引を削除してもよろしいですか？'
             }
         };
 
@@ -1088,9 +1111,7 @@
                 if (transaction.amount > currentBalance) {
                     const debtAmount = transaction.amount - Math.max(currentBalance, 0);
                     alert(t('errorDebt'));
-                    if (currentBalance > 0) {
-                        transactions.push(transaction);
-                    }
+                    transactions.push(transaction);
                     transactions.push({
                         text: t('selfDebt'),
                         amount: debtAmount,
